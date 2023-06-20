@@ -30,3 +30,88 @@
 3. patch user Api . 
 
 ##   
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database'); // Assuming you have a database connection setup
+
+const BookmarkedContent = sequelize.define('BookmarkedContent', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  contentId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  bookmarkedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+});
+
+module.exports = BookmarkedContent;
+
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database'); // Assuming you have a database connection setup
+
+const SavedArticles = sequelize.define('SavedArticles', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  articleId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  savedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+});
+
+module.exports = SavedArticles;
+
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database'); // Assuming you have a database connection setup
+
+const UserPreferences = sequelize.define('UserPreferences', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  categories: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  interests: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+});
+
+module.exports = UserPreferences;
+

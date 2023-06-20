@@ -30,4 +30,8 @@ export const createNews = async(req,res) =>{
     }
 }
 
+export const getAllNews = async (req, res) => {
+    
+}
+
 

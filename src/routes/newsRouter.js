@@ -2,7 +2,7 @@ import  express from 'express';
 const router = express.Router();
 import { Admin_authentication } from '../middleware/auth.js';
 import { body, param } from 'express-validator';
-import { createNews } from '../controllers/newsController.js';
+import { createNews, getAllNews } from '../controllers/newsController.js';
 
 
 
@@ -34,7 +34,7 @@ router.post('/create',Admin_authentication,  [
        .withMessage("category id is not validate"),
   ],createNews);
 
-router.get('/getall',)
+router.get('/getall',getAllNews)
 router.get('/get/:newsId',[param('newsId')])
 router.put('/update/:newsId',)
 router.delete('/delete/:newsId',)
