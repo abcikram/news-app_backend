@@ -24,9 +24,9 @@ const newsSchema = new mongoose.Schema({
         enum:["major","no_major"],
         required:true,
     },
-    category:{
+    categoryId:{
        type:ObjectId,
-       ref:"topic",
+       ref:"category",
        required:true,
     },
 },{timestamps:true})

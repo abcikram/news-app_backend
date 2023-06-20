@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
-    topic:{
+    category:{
         type:String,
         required :true,
     },
@@ -12,6 +12,6 @@ const categorySchema = new mongoose.Schema({
     
 },{timestamps:true})
 
-const Category = mongoose.model("topic",categorySchema)
+const Category = mongoose.model("category",categorySchema)
 
 export default Category

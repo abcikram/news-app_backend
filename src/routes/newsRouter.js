@@ -2,7 +2,7 @@ import  express from 'express';
 const router = express.Router();
 import { Admin_authentication } from '../middleware/auth.js';
 import { body, param } from 'express-validator';
-import { createNews, getAllNews } from '../controllers/newsController.js';
+import { createNews, getAllNews, particularCategory,newsTopHeadlline, trendingTopic, findTypedata } from '../controllers/newsController.js';
 
 
 
@@ -27,15 +27,24 @@ router.post('/create',Admin_authentication,  [
         .withMessage("news type must be present")
         .isIn(["major","no_major"])
         .withMessage("news type must be major,no_major") ,
-    body("category")
+    body("categoryId")
        .notEmpty()
        .withMessage("category is required")
        .isMongoId()
        .withMessage("category id is not validate"),
   ],createNews);
 
-router.get('/getall',getAllNews)
-router.get('/get/:newsId',[param('newsId')])
+router.get('/getall',getAllNews);
+router.get('/get/type',findTypedata)
+router.get('/topheadlines',newsTopHeadlline)
+router.get('/trending',trendingTopic)
+
+router.get('/category/:categoryId',[
+  param("categoryId").isMongoId().withMessage("categoryId is not valid")
+],particularCategory)
+
+
+
 router.put('/update/:newsId',)
 router.delete('/delete/:newsId',)
 
