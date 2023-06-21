@@ -19,8 +19,7 @@
 4. create get api for reader .
 5. create get api for particular news (get/news/:id)
 6. put api for updating the news **only admin can access**.
-7. patch api for reader where he/she saved the news.
-8. Get Top Headlines:
+7. Get Top Headlines:
 
    - Endpoint: GET /api/news/top-headlines
    - Description: Retrieve the top headlines from various news sources.
@@ -43,6 +42,8 @@
 8. POST /api/user/content/bookmark: Bookmark a piece of content.
 9. DELETE /api/user/content/bookmark/{contentId}: Remove a bookmarked content item.
 10. GET /api/user/recommendations: Get personalized recommendations based on the user's preferences.
+
+https://lively-escape-193305.postman.co/workspace/New-Team-Workspace~ddb97bb9-5687-42d8-9e63-e18db34cdf37/collection/21786399-719d2ecb-28aa-4640-8a17-5db3cea29f21?action=share&creator=21786399
 
 
 

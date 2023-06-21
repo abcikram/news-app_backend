@@ -59,12 +59,12 @@ router.post('/login', [
 router.get('/getAll',Admin_authentication,getAllAdmin)
 
 router.get('/get/:adminId',Admin_authentication,[
-    param('adminId').isMongoId().withMessage("adminId is validate")
+    param('adminId').isMongoId().withMessage("adminId is not validate")
 ],getParticularAdmin)
 
 
 router.patch('/update/:adminId',Admin_authentication, [
-    param('adminId').isMongoId().withMessage("adminId is validate"),
+    param('adminId').isMongoId().withMessage("adminId is not validate"),
     body("name")
       .optional()
       .isString()

@@ -31,7 +31,7 @@ export const createNews = async(req,res) =>{
         
         const createNews = await News.create(req.body);
 
-        res.status(201).json({status:true, message:"admin is created successfully", data:createNews})
+        res.status(201).json({status:true, message:"admin add the news successfully", data:createNews})
     }catch(error){
         return res.status(500).json({ status: false, message: error.message });
     }

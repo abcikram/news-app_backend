@@ -24,12 +24,18 @@ const newsSchema = new mongoose.Schema({
         enum:["major","no_major"],
         required:true,
     },
+    numberOfBookmarks:{
+        type:Number,
+        default:0,
+    },
     categoryId:{
        type:ObjectId,
        ref:"category",
        required:true,
     },
 },{timestamps:true})
+
+
 
 const News = mongoose.model('news',newsSchema)
 
