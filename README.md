@@ -20,6 +20,13 @@
 5. create get api for particular news (get/news/:id)
 6. put api for updating the news **only admin can access**.
 7. patch api for reader where he/she saved the news.
+8. Get Top Headlines:
+
+   - Endpoint: GET /api/news/top-headlines
+   - Description: Retrieve the top headlines from various news sources.
+   - Query Parameters:
+   - country (optional): Filter articles based on the country of the news source.
+   - **category (optional): Filter articles based on the category (e.g., business, sports, technology).Response: Returns a list of top headlines.**
 
 ---
 ## User API :-
@@ -28,6 +35,27 @@
 2. Create user Api .
 2. get user Api .
 3. patch user Api . 
+
+4. GET /api/user/preferences: Retrieve the user's current preferences and customization options.
+5. PUT /api/user/preferences: Update the user's preferences and customization options.
+6. POST /api/user/articles/save: Save an article to the user's saved articles list.
+7. DELETE /api/user/articles/save/{articleId}: Remove a saved article from the user's savedarticles list.
+8. POST /api/user/content/bookmark: Bookmark a piece of content.
+9. DELETE /api/user/content/bookmark/{contentId}: Remove a bookmarked content item.
+10. GET /api/user/recommendations: Get personalized recommendations based on the user's preferences.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##   
 const { DataTypes } = require('sequelize');

@@ -5,7 +5,9 @@ import connectDB from '../mongoDB/db.js';
 import Colors from 'colors';
 import adminRouter from './routes/adminRouter.js'
 import newsRouter from './routes/newsRouter.js'
-import categoryRouter from './routes/categoryRouter.js'
+import categoryRouter from './routes/categoryRouter.js';
+import userRouter from './routes/userRouter.js';
+
 const app = express();
 
 dotenv.config()
@@ -18,7 +20,8 @@ app.use(express.urlencoded({extended:false}))
 
 app.use('/admin',adminRouter)
 app.use('/news',newsRouter)
-app.use('/category',categoryRouter)
+app.use('/category', categoryRouter)
+app.use('/user',userRouter)
 
 const PORT = process.env.PORT;
 
