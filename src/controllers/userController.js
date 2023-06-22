@@ -307,39 +307,78 @@ export const removeSavedNews = async(req,res) =>{
 
 export const addcategory = async(req,res) =>{
     try {
-        const {preference} = req.body;
+        const {category,type} = req.body;
 
         const userIdFromToken = req.userId
     
         if (!isValidObjectId(userIdFromToken))
           return res.status(400).json({ status: false, message: "Token is not validate" });
 
-        if (!isValidObjectId(preference))
+        if (!isValidObjectId(category))
           return res.status(400).json({ status: false, message: "preference is not validate" });
+
+        if(["green", "yellow", "red"].indexOf(type) == -1)  
+          return res.status(400).json({ status: false, message: "type must be in green , yellow , red" });;
 
         const findfromtoken = await User.findById(userIdFromToken)
 
+        const findCategory = await Category.findOne({_id:category})
+
         if(!findfromtoken) return res.status(404).json({status:false,message:"User is not found"})
-
-        const addcategory = await User.findByIdAndUpdate(userIdFromToken,
-            { $push: { preference: preference }},{new:true}) 
         
-        const findCategory = await Category.findOne({_id:preference})
+        //++++++++++++ find the category exist in user's preference of not +++++++++// 
+        const findExistCategory = await User.findOne({ "preference.category" : category }) 
 
-         res.status(200).json({status:true,message:`user add ${findCategory.category} category`,data:addcategory})
+        if(!findExistCategory) {
+        //++++++++++++++++++++ category is not exist in the user's preference +++++++++++++++++++++// 
+
+            const addcategory = await User.findByIdAndUpdate(userIdFromToken,
+                { $addToSet:
+                    { preference: {category :category , type : type} }
+                },{new:true}
+              ).populate({
+                path: "preference.category",
+                select: "category -_id ",
+              })        
+    
+            res.status(200).json({
+                status:true,
+                message:`user add ${findCategory.category} category`,
+                data:addcategory
+            })
+        }
+        
+        //++++++++++++++ category is already exist , only category type will be updated :-+++++++++++++++++++++//
+
+            const updateCategory = await User.findOneAndUpdate({"preference.category" : category},
+                    {
+                        $set:{"preference.$.type":type}
+                    },
+                    {new:true}
+                ).populate({
+                    path: "preference.category",
+                    select: "category -_id ",
+                  });
+      
+
+            res.status(200).json({
+                status:true,
+                message:`user update ${findCategory.category} category to type ${type}`,
+                data:updateCategory
+            })
 
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
 }
 
-//++++++++++++++++++++++++++++++++++++ remove Category +++++++++++++++++++++++++++++++++++++++++++//
+//+++++++++++++++++++++++++++++++++++++++ remove Category +++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const removeCategory = async(req,res) =>{
     try {
         const categoryId = req.params.categoryId;
 
-        const userIdFromToken = req.userId
+        const userIdFromToken = req.userId;
     
         if (!isValidObjectId(userIdFromToken))
           return res.status(400).json({ status: false, message: "Token is not validate" });
@@ -352,7 +391,11 @@ export const removeCategory = async(req,res) =>{
         if(!findfromtoken) return res.status(404).json({status:false,message:"User is not found"})
 
         const removecategory = await User.findByIdAndUpdate(userIdFromToken,
-            { $pull: { preference: categoryId }},{new:true}) 
+            { $pull: { preference: {category :categoryId} }},{new:true})
+            .populate({
+                path: "preference.category",
+                select: "category -_id ",
+              })
 
         const findCategory = await Category.findOne({_id:categoryId})
     
@@ -363,45 +406,89 @@ export const removeCategory = async(req,res) =>{
     }
 }   
     
-//+++++++++++++++++++++++++++++++++++++ get preference +++++++++++++++++++++++++++++++++++++++//
+//+++++++++++++++++++++++++++++++++++++++++++++ get preference ++++++++++++++++++++++++++++++++++++++++++++++++//
     
 export const getPrefenceUser = async(req,res) =>{
-    try {
-        // GET /api/news
-        router.get('/api/news', async (req, res) => {
             try {
-                const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+                const userIdFromToken = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
 
                 // Retrieve the user's preferences from the database
-                const user = await User.findById(userId).select('preferences');
+                const user = await User.findById(userIdFromToken).select('preference');
+
+                // const useAlPreference = user.preference.map(preference => preference.category);
 
                 // Extract the preferred categories and types from the user's preferences
-                const preferredCategories = user.preferences.map(preference => preference.category);
-                const preferredTypes = user.preferences.reduce((types, preference) => {
-                    if (preference.type === 'all news') {
-                        types.push('all news');
-                    } else if (preference.type === 'major news') {
-                        types.push('major');
+                // const preferredCategories = user.preference.filter(preference => preference.type !== 'red')
+                // .map(preference => preference.category);
+
+                // res.send({data:preferredCategories})
+
+                
+               const preferenceFilters = [];
+
+                const categories =user.preference.map((item) => {
+                    let preferenceObject = { categoryId: item.category };
+                    if (item.type === "yellow") {
+                      preferenceObject.type = "major";
+                    } else if (item.type === "red") {
+                      return item.category;
                     }
-                    return types;
-                }, []);
+                    preferenceFilters.push(preferenceObject);
+                    return item.category;
+                  });
+                  
+                //   console.log(preferenceFilters);
+
+                // const preferredCategoriesAndType = user.preference.filter(preference => preference.type !== 'red')
+                // .map(preference => ({ category: preference.category, type: preference.type }));
+
+                // res.send({data: preferredCategoriesAndType })
+
+                // console.log("preferredCategories",preferredCategories);
+
+                const lengthPurpus  = await News.find({
+                    $or:[
+                          {
+                             categoryId: { $nin: categories },
+                          },
+                          ...preferenceFilters     
+                    ]
+                   
+                }).countDocuments()
+
+                const totalNews =  lengthPurpus
+
+                console.log(totalNews);
+               
+
+                //---------- news pagination ------------//
+                let page = Number(req.query.page) || 1;
+                let limit = Number(req.query.limit) || 5;
+  
+                let skip = (page - 1) * limit;
+
+                let hasPage=true
+                if(lengthPurpus<=page*limit) {
+                    hasPage = false
+                }
+
 
                 // Fetch news articles based on the user's preferences
-                const newsArticles = await News.find({
-                    categoryId: { $in: preferredCategories },
-                    type: { $in: preferredTypes }
-                }).sort({ createdAt: -1 });
+                const newsArticles  = await News.find({
+                    $or:[
+                          {
+                             categoryId: { $nin: categories },
+                          },
+                          ...preferenceFilters     
+                    ]
+                   
+                }).sort({ createdAt: -1 }).populate({
+                    path:'categoryId',
+                    select: "category -_id ",
+                }).skip(skip).limit(limit);
 
-                res.json(newsArticles);
-            } catch (error) {
-                console.error('Error fetching news articles:', error);
-                res.status(500).json({ error: 'Failed to fetch news articles' });
-            }
-        });
 
-    
-    
-    
+                res.status(200).json({status:true, hasPage : hasPage, totalNews:totalNews,data:newsArticles});
         
     } catch (error) {
         res.status(500).json({ status: false, message: error.message });
@@ -410,13 +497,13 @@ export const getPrefenceUser = async(req,res) =>{
 
 
 // GET /api/news
-router.get('/api/news', async (req, res) => {
+export const userPreference = async (req, res) => {
     try {
         const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
-
+  
         // Retrieve the user's preferences from the database
-        const user = await User.findById(userId).select('preferences');
-
+        const user = await User.findById(userId).select('preference');
+    
         // Extract the preferred categories and types from the user's preferences
         const preferredCategories = user.preferences
             .filter(preference => preference.type !== 'no news')
@@ -431,16 +518,42 @@ router.get('/api/news', async (req, res) => {
                 }
                 return types;
             }, []);
-
+  
         // Fetch news articles based on the user's preferences
         const newsArticles = await News.find({
             categoryId: { $in: preferredCategories },
             type: { $in: preferredTypes }
         }).sort({ createdAt: -1 });
-
+  
         res.json(newsArticles);
     } catch (error) {
         console.error('Error fetching news articles:', error);
         res.status(500).json({ error: 'Failed to fetch news articles' });
     }
-});
+  };
+
+
+  export const upreference = async (req, res) => {
+    try {
+      const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+  
+      // Retrieve the user's preferences from the database
+      const user = await User.findById(userId).select('preference');
+  
+      // Extract the preferred category names and types from the user's preferences
+      const preferredCategories = user.preference.map(preference => preference.category);
+    //   console.log("preferredCategories",preferredCategories);
+  
+      // Fetch news articles based on the user's preferences
+      const newsArticles = await News.find({
+        categoryId: { $in: preferredCategories },
+      }).sort({ createdAt: -1 }) .populate({
+        path: "categoryId",
+        select: "category -_id ",
+      });
+  
+      res.status(200).json({status:true,data:newsArticles});
+    } catch (error) {
+        res.status(500).json({ status: false, message: error.message });
+    }
+  };

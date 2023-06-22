@@ -9,7 +9,9 @@ import {
   removeSavedNews,
   saveBookmarks,
   addcategory,
-  removeCategory
+  removeCategory,
+  userPreference,
+  upreference,getPrefenceUser
 } from "../controllers/userController.js";
 import { body, check, param } from "express-validator";
 import { User_authentication } from "../middleware/auth_user.js";
@@ -61,8 +63,17 @@ router.post(
     body("preference")
       .notEmpty()
       .withMessage("preference is required")
+      .isArray()
+      .withMessage("preference is in array"),
+    check("preference.*.category")
+      .notEmpty()
+      .withMessage("news category must be required")
       .isMongoId()
-      .withMessage("preference is validate"),
+      .withMessage("CategoryId must be in string"),
+    check("preference.*.type")
+      .optional()
+      .isIn(['green','yellow','red'])
+      .withMessage("Type must be in green , yellow, red")
   ],
   createUser
 );
@@ -130,5 +141,8 @@ router.delete('/news/save/:newsId',User_authentication,removeSavedNews)
 router.post('/category/save',User_authentication,addcategory)
 
 router.delete('/category/save/:categoryId',User_authentication,removeCategory)
+
+router.get('/preference',User_authentication,getPrefenceUser)
+
 
 export default router;

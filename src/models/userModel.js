@@ -24,13 +24,23 @@ const userSchema = new mongoose.Schema(
             type:[ObjectId],
             ref:'news',
         },
-        preference:{
-            type:[ObjectId],
-            ref:'category'
-        },
-    }, {
-    timestamps: true
-  },
+        preference:[
+            {
+                category : {
+                    type:ObjectId,
+                    ref:'category'
+                },
+                type: {
+                    type:String,
+                    enum:['green','yellow','red'],
+                    default:'green' 
+                }
+            }
+        ]
+    },
+      {
+        timestamps: true
+      },
 )
 
 const User = mongoose.model('user',userSchema);
