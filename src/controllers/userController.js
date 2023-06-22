@@ -367,7 +367,38 @@ export const removeCategory = async(req,res) =>{
     
 export const getPrefenceUser = async(req,res) =>{
     try {
-        
+        // GET /api/news
+        router.get('/api/news', async (req, res) => {
+            try {
+                const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+
+                // Retrieve the user's preferences from the database
+                const user = await User.findById(userId).select('preferences');
+
+                // Extract the preferred categories and types from the user's preferences
+                const preferredCategories = user.preferences.map(preference => preference.category);
+                const preferredTypes = user.preferences.reduce((types, preference) => {
+                    if (preference.type === 'all news') {
+                        types.push('all news');
+                    } else if (preference.type === 'major news') {
+                        types.push('major');
+                    }
+                    return types;
+                }, []);
+
+                // Fetch news articles based on the user's preferences
+                const newsArticles = await News.find({
+                    categoryId: { $in: preferredCategories },
+                    type: { $in: preferredTypes }
+                }).sort({ createdAt: -1 });
+
+                res.json(newsArticles);
+            } catch (error) {
+                console.error('Error fetching news articles:', error);
+                res.status(500).json({ error: 'Failed to fetch news articles' });
+            }
+        });
+
     
     
     
@@ -376,3 +407,40 @@ export const getPrefenceUser = async(req,res) =>{
         res.status(500).json({ status: false, message: error.message });
     }
 }   
+
+
+// GET /api/news
+router.get('/api/news', async (req, res) => {
+    try {
+        const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+
+        // Retrieve the user's preferences from the database
+        const user = await User.findById(userId).select('preferences');
+
+        // Extract the preferred categories and types from the user's preferences
+        const preferredCategories = user.preferences
+            .filter(preference => preference.type !== 'no news')
+            .map(preference => preference.category);
+        const preferredTypes = user.preferences
+            .filter(preference => preference.type !== 'no news')
+            .reduce((types, preference) => {
+                if (preference.type === 'all news') {
+                    types.push('all news');
+                } else if (preference.type === 'major news') {
+                    types.push('major');
+                }
+                return types;
+            }, []);
+
+        // Fetch news articles based on the user's preferences
+        const newsArticles = await News.find({
+            categoryId: { $in: preferredCategories },
+            type: { $in: preferredTypes }
+        }).sort({ createdAt: -1 });
+
+        res.json(newsArticles);
+    } catch (error) {
+        console.error('Error fetching news articles:', error);
+        res.status(500).json({ error: 'Failed to fetch news articles' });
+    }
+});

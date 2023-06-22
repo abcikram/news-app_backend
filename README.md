@@ -45,6 +45,47 @@
 
 https://lively-escape-193305.postman.co/workspace/New-Team-Workspace~ddb97bb9-5687-42d8-9e63-e18db34cdf37/collection/21786399-719d2ecb-28aa-4640-8a17-5db3cea29f21?action=share&creator=21786399
 
+// POST /api/user/preferences
+router.post('/api/user/preferences', async (req, res) => {
+  try {
+    const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+    const { preferences } = req.body;
+
+    // Update the user's preferences in the User schema
+    const user = await User.findByIdAndUpdate(userId, { preferences }, { new: true });
+
+    res.json(user.preferences);
+  } catch (error) {
+    console.error('Error updating user preferences:', error);
+    res.status(500).json({ error: 'Failed to update user preferences' });
+  }
+});
+
+// GET /api/news
+router.get('/api/news', async (req, res) => {
+  try {
+    const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+
+    // Retrieve the user's preferences from the database
+    const user = await User.findById(userId).select('preferences');
+
+    // Extract the preferred category names and types from the user's preferences
+    const preferredCategories = user.preferences.map(preference => preference.category);
+    const preferredTypes = user.preferences.map(preference => preference.type);
+
+    // Fetch news articles based on the user's preferences
+    const newsArticles = await Article.find({
+      category: { $in: preferredCategories },
+      type: { $in: preferredTypes }
+    }).sort({ createdAt: -1 });
+
+    res.json(newsArticles);
+  } catch (error) {
+    console.error('Error fetching news articles:', error);
+    res.status(500).json({ error: 'Failed to fetch news articles' });
+  }
+});
+
 
 
 
