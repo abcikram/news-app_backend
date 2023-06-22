@@ -20,7 +20,9 @@ export default UserOtpVarification;
 
 
 
-// The code you provided is a MongoDB index creation statement using the index() method. It creates an index on the createdAt field of the userOtpVarificationSchema collection and specifies an expiration time of 60 seconds for the documents in that collection.
+// The code you provided is a MongoDB index creation statement using the index() method.
+// It creates an index on the createdAt field of the userOtpVarificationSchema collection 
+// and specifies an expiration time of 60 seconds for the documents in that collection.
 
 // The { createdAt: 1 } part indicates that the index is created on the createdAt field in ascending order (1 represents ascending order, while -1 represents descending order).
 

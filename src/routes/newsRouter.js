@@ -2,11 +2,12 @@ import  express from 'express';
 const router = express.Router();
 import { Admin_authentication } from '../middleware/auth.js';
 import { body, param } from 'express-validator';
-import { createNews, getAllNews, particularCategory,newsTopHeadlline, trendingTopic, findTypedata } from '../controllers/newsController.js';
+import { createNews, getAllNews, particularCategory,newsTopHeadlline, trendingTopic, findTypedata, removeNews,updateNews } from '../controllers/newsController.js';
 
 
 
-router.post('/create',Admin_authentication,  [
+router.post('/create', Admin_authentication,
+  [
     body("title")
       .notEmpty()
       .withMessage("title must be present")
@@ -14,7 +15,7 @@ router.post('/create',Admin_authentication,  [
       .withMessage("title must be in string"),
     body("description")
       .notEmpty()
-      .withMessage("mrp should be present")
+      .withMessage("description should be present")
       .isString()
       .withMessage("description must be in String"),
     body("originalURL")
@@ -29,9 +30,9 @@ router.post('/create',Admin_authentication,  [
         .withMessage("news type must be major,no_major") ,
     body("categoryId")
        .notEmpty()
-       .withMessage("category is required")
+       .withMessage("categoryId is required")
        .isMongoId()
-       .withMessage("category id is not validate"),
+       .withMessage("categoryId is not validate"),
   ],createNews);
 
 router.get('/getall',getAllNews);
@@ -44,9 +45,30 @@ router.get('/category/:categoryId',[
 ],particularCategory)
 
 
+router.patch('/update/:newsId',Admin_authentication, [
+  body("title")
+    .optional()
+    .isString()
+    .withMessage("title must be in string"),
+  body("description")
+    .optional()
+    .isString()
+    .withMessage("description must be in String"),
+  body("originalURL")
+    .optional()
+    .isString()
+    .withMessage("originalURL should be in the String"),
+  body("type")
+    .optional()
+    .isIn(["major", "no_major"])
+    .withMessage("news type must be major,no_major"),
+  body("categoryId")
+    .optional()
+    .isMongoId()
+    .withMessage("category id is not validate"),
+], updateNews);
 
-router.put('/update/:newsId',)
-router.delete('/delete/:newsId',)
+router.delete('/delete/:newsId',Admin_authentication,removeNews)
 
 
 

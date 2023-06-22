@@ -1,9 +1,11 @@
 import News from "../models/newsModel.js";
 import Category from "../models/categoryModel.js";
-import { validationResult } from "express-validator";
+import { validationResult ,matchedData} from "express-validator";
+import { isValidObjectId } from "mongoose";
 
 
-//create category :-
+//++++++++++++++++++++++++++++++++++++++++ create category  ++++++++++++++++++++++++++++++++++++++++++++//
+
 export const createCategory = async(req,res) =>{
     try{
         const error = validationResult(req);
@@ -19,16 +21,22 @@ export const createCategory = async(req,res) =>{
     }
 }
 
-//create news :-
+//+++++++++++++++++++++++++++++++++++++++++ create news ++++++++++++++++++++++++++++++++++++++++++++++++//
+
 export const createNews = async(req,res) =>{
     try{
-
+        
         const error = validationResult(req);
  
         if (!error.isEmpty()) {
            return res.status(400).json({ errors: error.array()[0].msg });
         }
-        
+
+        const userIdFromToken = req.userId;
+
+        if (!isValidObjectId(userIdFromToken))
+            return res.status(400).json({ status: false, message: "Token is not valid" });
+
         const createNews = await News.create(req.body);
 
         res.status(201).json({status:true, message:"admin add the news successfully", data:createNews})
@@ -37,6 +45,7 @@ export const createNews = async(req,res) =>{
     }
 }
 
+//+++++++++++++++++++++++++++++++++++++++++ get particular news ++++++++++++++++++++++++++++++++++++++++++++//
 
 export const particularCategory = async(req,res) =>{
     try{
@@ -57,10 +66,37 @@ export const particularCategory = async(req,res) =>{
     }   
 }
 
-export const newsTopHeadlline = async(req,res) =>{
+//++++++++++++++++++++++++++++++++++++++++ Top Headline news ++++++++++++++++++++++++++++++++++++++++++++++++++//
 
+export const newsTopHeadlline = async(req,res) =>{
+    try {
+
+        //---------- news pagination ------------//
+        let page = Number(req.query.page) || 1;
+        let limit = Number(req.query.limit) || 3;
+
+        let skip = (page - 1) * limit;
+
+        const HeadlineNews = await News.find({
+            "createdAt": { $gt: new Date(Date.now() - 4 * 60 * 60 * 1000) }
+        }).sort({ "numberOfBookmarks": -1 }).skip(skip).limit(limit)
+        
+        if (HeadlineNews.length == 0) {
+            return res.status(404).send({ status: false, message: "No headline news found" });
+        }
+
+        res.status(200).json({
+            status: true,
+            message: "This is today's following Headline news",
+            data: HeadlineNews
+        })
+        
+      } catch (error) {
+          return res.status(500).json({ status: false, message: error.message });
+      }
 }
 
+//+++++++++++++++++++++++++++++++++++++++++++++ trending news ++++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const trendingTopic = async(req,res) =>{
     try {
@@ -70,7 +106,7 @@ export const trendingTopic = async(req,res) =>{
   
     let skip = (page - 1) * limit;
 
-    // we filtering the news which is created 7 hours ago . and then we filtering  , whose type is 
+    // we filtering the news which is created 7 hours ago. and then we filtering ,whose type it is. 
     const trendingNews = await News.find({ 
         "createdAt" : {$gt:new Date(Date.now() - 7*60*60*1000)},type:'major'
       }).skip(skip).limit(limit)
@@ -87,6 +123,7 @@ export const trendingTopic = async(req,res) =>{
     
 }
 
+//+++++++++++++++++++++++++++++++++++++++++++ get All News ++++++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const getAllNews = async (req, res) => {
  //search the news :-
@@ -125,6 +162,7 @@ export const getAllNews = async (req, res) => {
 
 }
 
+//+++++++++++++++++++++++ select particular category and seclect major or non major  or no news ++++++++++++++//
 
 export const findTypedata = async(req,res) =>{
     try {
@@ -168,4 +206,56 @@ export const findTypedata = async(req,res) =>{
     }
 }
 
+
+//+++++++++++++++++++++++++++++++++++++ update The news +++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+export const updateNews = async (req, res) => {
+    try {
+        const newsId = req.params.newsId;
+
+        const userIdFromToken = req.userId;
+
+        if (!isValidObjectId(newsId)) return res.status(400).json({ status: false, message: "newsId is not valid" });
+
+        if (!isValidObjectId(userIdFromToken)) return res.status(400).json({ status: false, message: "Token is not valid" });
+
+        const error = validationResult(req);
+
+        if (!error.isEmpty()) {
+            return res.status(400).json({ errors: error.array()[0].msg });
+        }
+
+        const data = matchedData(req);
+
+        const updateNews = await News.findByIdAndUpdate({ _id: newsId }, {
+            $set: data
+        }, { new: true }
+        );
+
+        res.status(200).json({ status: true, message: "admin update this news successfully", data: updateNews })
+    } catch (error) {
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
+
+
+//++++++++++++++++++++++++++++++++++++++ remove news from data base ++++++++++++++++++++++++++++++++++++++++//
+
+export const removeNews = async (req, res) => {
+    try {
+        const newsId = req.params.newsId;
+        
+        const userIdFromToken = req.userId;
+
+        if (!isValidObjectId(newsId)) return res.status(400).json({ status: false, message: "newsId is not valid" });
+
+        if (!isValidObjectId(userIdFromToken)) return res.status(400).json({ status: false, message: "Token is not valid" });
+
+        const removeNews = await News.deleteOne({_id:newsId});
+
+        res.status(200).json({ status: true, message: "admin remove this news successfully"})
+    } catch (error) {
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
 

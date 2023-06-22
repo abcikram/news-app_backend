@@ -10,8 +10,7 @@ import {
   saveBookmarks,
   addcategory,
   removeCategory,
-  userPreference,
-  upreference,getPrefenceUser
+  getPrefenceUser
 } from "../controllers/userController.js";
 import { body, check, param } from "express-validator";
 import { User_authentication } from "../middleware/auth_user.js";
@@ -143,6 +142,7 @@ router.post('/category/save',User_authentication,addcategory)
 router.delete('/category/save/:categoryId',User_authentication,removeCategory)
 
 router.get('/preference',User_authentication,getPrefenceUser)
+
 
 
 export default router;

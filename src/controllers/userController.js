@@ -69,7 +69,7 @@ export const sendOtpToEmail = async (req, res) => {
 }
 
 
-//++++++++++++++++++++++++++++++++ user verifyOTP ++++++++++++++++++++++++++++++++++++++++++++//
+//++++++++++++++++++++++++++++++++++++ user verifyOTP ++++++++++++++++++++++++++++++++++++++++++++//
 
 
 export const verifyOTP = async(req,res) =>{
@@ -109,7 +109,7 @@ export const verifyOTP = async(req,res) =>{
     }
 }
 
-//++++++++++++++++++++++++++++++ user create ++++++++++++++++++++++++++++++++++++++++++++++//
+//+++++++++++++++++++++++++++++++++++++ user create ++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const createUser = async(req,res) =>{
     try {
@@ -141,7 +141,7 @@ export const createUser = async(req,res) =>{
     }
 }
 
-//++++++++++++++++++++++++++++++ userLogin +++++++++++++++++++++++++++++++++++++++++++++++//
+//++++++++++++++++++++++++++++++++++++++ userLogin +++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const loginUser = async(req,res) =>{
     try {
@@ -195,7 +195,7 @@ export const loginUser = async(req,res) =>{
 }
 
 
-//++++++++++++++++++++++++++++ user profile Update +++++++++++++++++++++++++++++++++++++//
+//+++++++++++++++++++++++++++++++++++++ user profile Update +++++++++++++++++++++++++++++++++++++++//
 
 export const updateUserProfile = async(req,res) =>{
     try {
@@ -241,7 +241,7 @@ export const updateUserProfile = async(req,res) =>{
       }
 }
 
-//+++++++++++++++++++++++++++++++++ User Saved bookmarks +++++++++++++++++++++++++++++++++++++++++//
+//++++++++++++++++++++++++++++++++++ User Saved bookmarks +++++++++++++++++++++++++++++++++++++++++//
 
 export const saveBookmarks = async(req,res) =>{
     try {
@@ -326,11 +326,11 @@ export const addcategory = async(req,res) =>{
 
         if(!findfromtoken) return res.status(404).json({status:false,message:"User is not found"})
         
-        //++++++++++++ find the category exist in user's preference of not +++++++++// 
+    //++++++++++++ find the category exist in user's preference of not +++++++++// 
         const findExistCategory = await User.findOne({ "preference.category" : category }) 
 
         if(!findExistCategory) {
-        //++++++++++++++++++++ category is not exist in the user's preference +++++++++++++++++++++// 
+    //+++++++++++++ category is not exist in the user's preference +++++++++++++++// 
 
             const addcategory = await User.findByIdAndUpdate(userIdFromToken,
                 { $addToSet:
@@ -348,7 +348,7 @@ export const addcategory = async(req,res) =>{
             })
         }
         
-        //++++++++++++++ category is already exist , only category type will be updated :-+++++++++++++++++++++//
+    //+++++++++++++ category is already exist,only category type will be updated +++++++++++++//
 
             const updateCategory = await User.findOneAndUpdate({"preference.category" : category},
                     {
@@ -406,7 +406,7 @@ export const removeCategory = async(req,res) =>{
     }
 }   
     
-//+++++++++++++++++++++++++++++++++++++++++++++ get preference ++++++++++++++++++++++++++++++++++++++++++++++++//
+//++++++++++++++++++++++++++++++++++++++ get preference +++++++++++++++++++++++++++++++++++++++++++//
     
 export const getPrefenceUser = async(req,res) =>{
             try {
@@ -414,15 +414,6 @@ export const getPrefenceUser = async(req,res) =>{
 
                 // Retrieve the user's preferences from the database
                 const user = await User.findById(userIdFromToken).select('preference');
-
-                // const useAlPreference = user.preference.map(preference => preference.category);
-
-                // Extract the preferred categories and types from the user's preferences
-                // const preferredCategories = user.preference.filter(preference => preference.type !== 'red')
-                // .map(preference => preference.category);
-
-                // res.send({data:preferredCategories})
-
                 
                const preferenceFilters = [];
 
@@ -438,13 +429,6 @@ export const getPrefenceUser = async(req,res) =>{
                   });
                   
                 //   console.log(preferenceFilters);
-
-                // const preferredCategoriesAndType = user.preference.filter(preference => preference.type !== 'red')
-                // .map(preference => ({ category: preference.category, type: preference.type }));
-
-                // res.send({data: preferredCategoriesAndType })
-
-                // console.log("preferredCategories",preferredCategories);
 
                 const lengthPurpus  = await News.find({
                     $or:[
@@ -490,47 +474,48 @@ export const getPrefenceUser = async(req,res) =>{
 
                 res.status(200).json({status:true, hasPage : hasPage, totalNews:totalNews,data:newsArticles});
         
-    } catch (error) {
+       } catch (error) {
         res.status(500).json({ status: false, message: error.message });
     }
 }   
 
 
-// GET /api/news
-export const userPreference = async (req, res) => {
-    try {
-        const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+//++++++++++++++++++++++++++++++++ User Preference of news ++++++++++++++++++++++++++++++++++++++++//
+
+// export const userPreference = async (req, res) => {
+//     try {
+//         const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
   
-        // Retrieve the user's preferences from the database
-        const user = await User.findById(userId).select('preference');
+//         // Retrieve the user's preferences from the database
+//         const user = await User.findById(userId).select('preference');
     
-        // Extract the preferred categories and types from the user's preferences
-        const preferredCategories = user.preferences
-            .filter(preference => preference.type !== 'no news')
-            .map(preference => preference.category);
-        const preferredTypes = user.preferences
-            .filter(preference => preference.type !== 'no news')
-            .reduce((types, preference) => {
-                if (preference.type === 'all news') {
-                    types.push('all news');
-                } else if (preference.type === 'major news') {
-                    types.push('major');
-                }
-                return types;
-            }, []);
+//         // Extract the preferred categories and types from the user's preferences
+//         const preferredCategories = user.preferences
+//             .filter(preference => preference.type !== 'no news')
+//             .map(preference => preference.category);
+//         const preferredTypes = user.preferences
+//             .filter(preference => preference.type !== 'no news')
+//             .reduce((types, preference) => {
+//                 if (preference.type === 'all news') {
+//                     types.push('all news');
+//                 } else if (preference.type === 'major news') {
+//                     types.push('major');
+//                 }
+//                 return types;
+//             }, []);
   
-        // Fetch news articles based on the user's preferences
-        const newsArticles = await News.find({
-            categoryId: { $in: preferredCategories },
-            type: { $in: preferredTypes }
-        }).sort({ createdAt: -1 });
+//         // Fetch news articles based on the user's preferences
+//         const newsArticles = await News.find({
+//             categoryId: { $in: preferredCategories },
+//             type: { $in: preferredTypes }
+//         }).sort({ createdAt: -1 });
   
-        res.json(newsArticles);
-    } catch (error) {
-        console.error('Error fetching news articles:', error);
-        res.status(500).json({ error: 'Failed to fetch news articles' });
-    }
-  };
+//         res.json(newsArticles);
+//     } catch (error) {
+//         console.error('Error fetching news articles:', error);
+//         res.status(500).json({ error: 'Failed to fetch news articles' });
+//     }
+//   };
 
 
   export const upreference = async (req, res) => {

@@ -4,6 +4,7 @@ import { validationResult, matchedData } from "express-validator";
 import jwt from 'jsonwebtoken'
 import { isValidObjectId } from "mongoose";
 
+//+++++++++++++++++++++++++++++++++++ admin register +++++++++++++++++++++++++++++++++++++++++++//
 
 export const createAdmin = async(req,res) => {
     try{
@@ -29,6 +30,7 @@ export const createAdmin = async(req,res) => {
     }
 }
 
+//+++++++++++++++++++++++++++++++++++++ admin Login +++++++++++++++++++++++++++++++++++++++++++++++//
 
 export const adminLogin = async(req,res) => {
     try{
@@ -82,6 +84,7 @@ export const adminLogin = async(req,res) => {
 
 }
 
+//+++++++++++++++++++++++++++++++++++++++++ get All Admin ++++++++++++++++++++++++++++++++++++++++//
 
 export const getAllAdmin = async(req,res) => {
   try{
@@ -107,6 +110,7 @@ export const getAllAdmin = async(req,res) => {
    
 }
 
+//++++++++++++++++++++++++++++++++++ get particular admin +++++++++++++++++++++++++++++++++++++++++//
 
 export const getParticularAdmin = async(req,res) =>{
     try{
@@ -143,6 +147,7 @@ export const getParticularAdmin = async(req,res) =>{
 
 }
 
+//+++++++++++++++++++++++++++++++++++++++ admin update +++++++++++++++++++++++++++++++++++++++++++//
 
 export const updateAdmin = async(req,res) => {
     try{
@@ -152,7 +157,8 @@ export const updateAdmin = async(req,res) => {
            return res.status(400).json({ errors: error.array()[0].msg });
         }
     
-        const data = matchedData(req);
+      const data = matchedData(req);
+      
         const adminAccess = await Admin.findById(data.adminId);
         
         if (!adminAccess)
@@ -179,6 +185,7 @@ export const updateAdmin = async(req,res) => {
 }
 
 
+//++++++++++++++++++++++++++++++++++++++ delete Admin +++++++++++++++++++++++++++++++++++++++++++++//
 
 export const deleteAdmin = async(req,res) => {
     try{
@@ -212,3 +219,6 @@ export const deleteAdmin = async(req,res) => {
         return res.status(500).json({ status: false, message: error.message });
     }
 }
+
+
+
