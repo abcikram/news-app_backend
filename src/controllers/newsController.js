@@ -162,7 +162,7 @@ export const getAllNews = async (req, res) => {
 
 }
 
-//+++++++++++++++++++++++ select particular category and seclect major or non major  or no news ++++++++++++++//
+//+++++++++++++++++++++++ select particular category and select major or non major  or no news ++++++++++++++//
 
 export const findTypedata = async(req,res) =>{
     try {

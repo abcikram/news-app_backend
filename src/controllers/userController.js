@@ -160,7 +160,6 @@ export const loginUser = async(req,res) =>{
 
         const passwordMatch = await bcrypt.compare(data.password, finddata.password)
 
-
         if (passwordMatch == false)
             return res.status(400).json({ status: false, message: "Please enter correct password" });
 
@@ -439,10 +438,6 @@ export const getPrefenceUser = async(req,res) =>{
                     ]
                    
                 }).countDocuments()
-
-                const totalNews =  lengthPurpus
-
-                console.log(totalNews);
                
 
                 //---------- news pagination ------------//
@@ -451,7 +446,8 @@ export const getPrefenceUser = async(req,res) =>{
   
                 let skip = (page - 1) * limit;
 
-                let hasPage=true
+                let hasPage=true;
+
                 if(lengthPurpus<=page*limit) {
                     hasPage = false
                 }
@@ -472,7 +468,7 @@ export const getPrefenceUser = async(req,res) =>{
                 }).skip(skip).limit(limit);
 
 
-                res.status(200).json({status:true, hasPage : hasPage, totalNews:totalNews,data:newsArticles});
+                res.status(200).json({status:true, hasPage : hasPage, totalNews:lengthPurpus,data:newsArticles});
         
        } catch (error) {
         res.status(500).json({ status: false, message: error.message });
@@ -518,27 +514,27 @@ export const getPrefenceUser = async(req,res) =>{
 //   };
 
 
-  export const upreference = async (req, res) => {
-    try {
-      const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
+  // export const upreference = async (req, res) => {
+  //   try {
+  //     const userId = req.userId; // Assuming you have implemented user authentication and obtained the user ID from the request
   
-      // Retrieve the user's preferences from the database
-      const user = await User.findById(userId).select('preference');
+  //     // Retrieve the user's preferences from the database
+  //     const user = await User.findById(userId).select('preference');
   
-      // Extract the preferred category names and types from the user's preferences
-      const preferredCategories = user.preference.map(preference => preference.category);
-    //   console.log("preferredCategories",preferredCategories);
+  //     // Extract the preferred category names and types from the user's preferences
+  //     const preferredCategories = user.preference.map(preference => preference.category);
+  //   //   console.log("preferredCategories",preferredCategories);
   
-      // Fetch news articles based on the user's preferences
-      const newsArticles = await News.find({
-        categoryId: { $in: preferredCategories },
-      }).sort({ createdAt: -1 }) .populate({
-        path: "categoryId",
-        select: "category -_id ",
-      });
+  //     // Fetch news articles based on the user's preferences
+  //     const newsArticles = await News.find({
+  //       categoryId: { $in: preferredCategories },
+  //     }).sort({ createdAt: -1 }) .populate({
+  //       path: "categoryId",
+  //       select: "category -_id ",
+  //     });
   
-      res.status(200).json({status:true,data:newsArticles});
-    } catch (error) {
-        res.status(500).json({ status: false, message: error.message });
-    }
-  };
+  //     res.status(200).json({status:true,data:newsArticles});
+  //   } catch (error) {
+  //       res.status(500).json({ status: false, message: error.message });
+  //   }
+  // };

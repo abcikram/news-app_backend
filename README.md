@@ -185,3 +185,9 @@ const UserPreferences = sequelize.define('UserPreferences', {
 
 module.exports = UserPreferences;
 
+
+
+Username :-roy146571
+Password :-Ska1FanAZAgUX18k
+
+link :- mongodb+srv://roy146571:<password>@cluster0.xpt1akt.mongodb.net/
